@@ -1,13 +1,13 @@
 # 任务管理
 
-`Tio.Avalonia.Standard.Modules.Tasks` 提供应用生命周期内统一的任务记录、嵌套、取消、进度、描述、日志和 UI 操作能力。
+`Standard.Modules.Tasks` 提供应用生命周期内统一的任务记录、嵌套、取消、进度、描述、日志和 UI 操作能力。
 
 ## 基本用法
 
 通过全局单例 `TaskManager.Instance` 创建根任务。创建只会生成状态为 `Pending` 的实体和任务树，绝不会自动执行；在验证、配置和子任务添加完成后，调用 `Start()` 才启动任务。
 
 ```csharp
-using Tio.Avalonia.Standard.Modules.Tasks;
+using Standard.Modules.Tasks;
 
 var task = TaskManager.Instance.CreateTask(
     new TaskOptions
