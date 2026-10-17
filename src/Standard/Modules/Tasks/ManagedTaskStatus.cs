@@ -1,7 +1,7 @@
 namespace Standard.Modules.Tasks;
 
 /// <summary>
-/// 表示受管理任务的生命周期状态。
+///     表示受管理任务的生命周期状态。
 /// </summary>
 public enum ManagedTaskStatus
 {

@@ -1,6 +1,3 @@
-using Avalonia.Controls;
-using TioUi.Controls;
-
 namespace Standard.Standard.Ui;
 
 public interface ITioWindow

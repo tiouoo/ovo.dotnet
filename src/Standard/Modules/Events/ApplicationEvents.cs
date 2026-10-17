@@ -1,5 +1,3 @@
-using Avalonia.Input;
-
 namespace Standard.Modules.Events;
 
 public static class ApplicationEvents
@@ -23,10 +21,7 @@ public static class ApplicationEvents
             var asyncHandler = (Func<Task<bool>>)handler;
             var canContinue = await asyncHandler.Invoke();
 
-            if (!canContinue)
-            {
-                return false;
-            }
+            if (!canContinue) return false;
         }
 
         return true;

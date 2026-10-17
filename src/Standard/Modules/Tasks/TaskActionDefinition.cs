@@ -1,7 +1,7 @@
 namespace Standard.Modules.Tasks;
 
 /// <summary>
-/// 创建任务操作时使用的定义。操作的执行、可见性和可用性都会基于当前任务实时计算。
+///     创建任务操作时使用的定义。操作的执行、可见性和可用性都会基于当前任务实时计算。
 /// </summary>
 public sealed class TaskActionDefinition
 {

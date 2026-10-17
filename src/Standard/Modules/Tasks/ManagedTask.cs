@@ -1,27 +1,28 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Text;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Standard.Modules.Tasks;
 
 /// <summary>
-/// 表示应用生命周期内的一个可观察、可取消任务节点。
+///     表示应用生命周期内的一个可观察、可取消任务节点。
 /// </summary>
 public sealed class ManagedTask : ObservableObject
 {
-    private readonly ObservableCollection<ManagedTask> _children = [];
     private readonly ObservableCollection<TaskAction> _actions = [];
-    private readonly ObservableCollection<TaskLogEntry> _logs = [];
     private readonly CancellationTokenSource _cancellationTokenSource;
-    private Func<TaskExecutionContext, Task>? _operation;
+    private readonly ObservableCollection<ManagedTask> _children = [];
     private readonly TaskCompletionSource _completionSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
-    private string? _description;
-    private ManagedTaskStatus _status = ManagedTaskStatus.Pending;
-    private DateTimeOffset? _startedAt;
+    private readonly ObservableCollection<TaskLogEntry> _logs = [];
     private DateTimeOffset? _completedAt;
+    private string? _description;
     private Exception? _exception;
+    private Func<TaskExecutionContext, Task>? _operation;
     private double? _progress;
+    private DateTimeOffset? _startedAt;
+    private ManagedTaskStatus _status = ManagedTaskStatus.Pending;
 
     internal ManagedTask(ManagedTask? parent, TaskOptions options, Func<TaskExecutionContext, Task>? operation)
     {
@@ -42,10 +43,7 @@ public sealed class ManagedTask : ObservableObject
         Logs = new ReadOnlyObservableCollection<TaskLogEntry>(_logs);
         _children.CollectionChanged += OnChildrenChanged;
 
-        foreach (var action in options.Actions)
-        {
-            _actions.Add(new TaskAction(this, action));
-        }
+        foreach (var action in options.Actions) _actions.Add(new TaskAction(this, action));
     }
 
     public Guid Id { get; }
@@ -109,12 +107,12 @@ public sealed class ManagedTask : ObservableObject
     public string? ErrorMessage => Exception?.Message;
 
     /// <summary>
-    /// 当前节点或其后代中最需要关注的任务说明。
+    ///     当前节点或其后代中最需要关注的任务说明。
     /// </summary>
     public string? DisplayDescription => GetDisplayTask()?.Description ?? Description;
 
     /// <summary>
-    /// 当前节点的进度，范围为 0 到 1。<see langword="null"/> 表示无法确定进度。
+    ///     当前节点的进度，范围为 0 到 1。<see langword="null" /> 表示无法确定进度。
     /// </summary>
     public double? Progress
     {
@@ -123,8 +121,8 @@ public sealed class ManagedTask : ObservableObject
     }
 
     /// <summary>
-    /// 当前任务树的连续进度。它会将当前节点和所有子任务的已知进度平均，
-    /// 适合在父任务上显示，避免分阶段任务完成时进度条回跳。
+    ///     当前任务树的连续进度。它会将当前节点和所有子任务的已知进度平均，
+    ///     适合在父任务上显示，避免分阶段任务完成时进度条回跳。
     /// </summary>
     public double? AggregateProgress
     {
@@ -136,9 +134,11 @@ public sealed class ManagedTask : ObservableObject
         }
     }
 
-    public bool IsTerminal => Status is ManagedTaskStatus.Cancelled or ManagedTaskStatus.Completed or ManagedTaskStatus.Faulted;
+    public bool IsTerminal =>
+        Status is ManagedTaskStatus.Cancelled or ManagedTaskStatus.Completed or ManagedTaskStatus.Faulted;
 
-    public bool CanBeCancelled => Status is ManagedTaskStatus.Pending or ManagedTaskStatus.Waiting or ManagedTaskStatus.Running;
+    public bool CanBeCancelled =>
+        Status is ManagedTaskStatus.Pending or ManagedTaskStatus.Waiting or ManagedTaskStatus.Running;
 
     public bool IsCancellationRequested => _cancellationTokenSource.IsCancellationRequested;
 
@@ -147,8 +147,8 @@ public sealed class ManagedTask : ObservableObject
     public Task Completion => _completionSource.Task;
 
     /// <summary>
-    /// 启动任务。没有执行器的任务进入 <see cref="ManagedTaskStatus.Running"/>，
-    /// 并由调用方通过 <see cref="Complete"/> 或 <see cref="Fault"/> 终结。
+    ///     启动任务。没有执行器的任务进入 <see cref="ManagedTaskStatus.Running" />，
+    ///     并由调用方通过 <see cref="Complete" /> 或 <see cref="Fault" /> 终结。
     /// </summary>
     public void Start()
     {
@@ -162,7 +162,7 @@ public sealed class ManagedTask : ObservableObject
     }
 
     /// <summary>
-    /// 为无执行器的任务指定执行器并启动。任务只能启动一次。
+    ///     为无执行器的任务指定执行器并启动。任务只能启动一次。
     /// </summary>
     public void Start(Func<TaskExecutionContext, Task> operation)
     {
@@ -185,10 +185,7 @@ public sealed class ManagedTask : ObservableObject
         // Child tokens are linked to this token and receive cancellation from this single request.
         _ = Task.Run(CancelCore);
 
-        foreach (var child in _children)
-        {
-            child.MarkCancelling();
-        }
+        foreach (var child in _children) child.MarkCancelling();
     }
 
     private void CancelCore()
@@ -228,10 +225,15 @@ public sealed class ManagedTask : ObservableObject
         return builder.ToString();
     }
 
-    public ManagedTask CreateChild(TaskOptions options) => CreateChildCore(options, null);
+    public ManagedTask CreateChild(TaskOptions options)
+    {
+        return CreateChildCore(options, null);
+    }
 
-    public ManagedTask CreateChild(TaskOptions options, Func<TaskExecutionContext, Task> operation) =>
-        CreateChildCore(options, operation);
+    public ManagedTask CreateChild(TaskOptions options, Func<TaskExecutionContext, Task> operation)
+    {
+        return CreateChildCore(options, operation);
+    }
 
     private ManagedTask CreateChildCore(TaskOptions options, Func<TaskExecutionContext, Task>? operation)
     {
@@ -244,7 +246,7 @@ public sealed class ManagedTask : ObservableObject
     }
 
     /// <summary>
-    /// 在任务存活期间动态添加一个可绑定的 UI 操作。
+    ///     在任务存活期间动态添加一个可绑定的 UI 操作。
     /// </summary>
     public TaskAction AddAction(TaskActionDefinition definition)
     {
@@ -257,7 +259,7 @@ public sealed class ManagedTask : ObservableObject
     }
 
     /// <summary>
-    /// 刷新动态任务操作的可见性和可用性。
+    ///     刷新动态任务操作的可见性和可用性。
     /// </summary>
     public void RefreshActions()
     {
@@ -265,7 +267,7 @@ public sealed class ManagedTask : ObservableObject
     }
 
     /// <summary>
-    /// 将一个无执行器的运行中或等待中任务标记为成功完成。
+    ///     将一个无执行器的运行中或等待中任务标记为成功完成。
     /// </summary>
     public void Complete()
     {
@@ -274,7 +276,7 @@ public sealed class ManagedTask : ObservableObject
     }
 
     /// <summary>
-    /// 将一个无执行器的运行中或等待中任务标记为失败。
+    ///     将一个无执行器的运行中或等待中任务标记为失败。
     /// </summary>
     public void Fault(Exception exception)
     {
@@ -300,7 +302,10 @@ public sealed class ManagedTask : ObservableObject
         Status = ManagedTaskStatus.Running;
     }
 
-    internal void SetDescription(string? description) => Description = description;
+    internal void SetDescription(string? description)
+    {
+        Description = description;
+    }
 
     internal void ReportProgress(double? progress)
     {
@@ -312,13 +317,25 @@ public sealed class ManagedTask : ObservableObject
         NotifyAggregateProgressChanged();
     }
 
-    internal void LogDebug(string message) => AddLog(TaskLogLevel.Debug, message);
+    internal void LogDebug(string message)
+    {
+        AddLog(TaskLogLevel.Debug, message);
+    }
 
-    internal void LogInformation(string message) => AddLog(TaskLogLevel.Information, message);
+    internal void LogInformation(string message)
+    {
+        AddLog(TaskLogLevel.Information, message);
+    }
 
-    internal void LogWarning(string message) => AddLog(TaskLogLevel.Warning, message);
+    internal void LogWarning(string message)
+    {
+        AddLog(TaskLogLevel.Warning, message);
+    }
 
-    internal void LogError(string message, Exception? exception = null) => AddLog(TaskLogLevel.Error, message, exception);
+    internal void LogError(string message, Exception? exception = null)
+    {
+        AddLog(TaskLogLevel.Error, message, exception);
+    }
 
     private async Task RunAsync()
     {
@@ -329,13 +346,9 @@ public sealed class ManagedTask : ObservableObject
         {
             await _operation!(new TaskExecutionContext(this));
             if (IsCancellationRequested)
-            {
                 CompleteCore(ManagedTaskStatus.Cancelled);
-            }
             else
-            {
                 CompleteCore(ManagedTaskStatus.Completed);
-            }
         }
         catch (OperationCanceledException) when (IsCancellationRequested)
         {
@@ -368,25 +381,17 @@ public sealed class ManagedTask : ObservableObject
     private void OnChildrenChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.NewItems is not null)
-        {
             foreach (ManagedTask child in e.NewItems)
-            {
                 child.PropertyChanged += OnChildPropertyChanged;
-            }
-        }
 
         if (e.OldItems is not null)
-        {
             foreach (ManagedTask child in e.OldItems)
-            {
                 child.PropertyChanged -= OnChildPropertyChanged;
-            }
-        }
 
         NotifyAggregateProgressChanged();
     }
 
-    private void OnChildPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void OnChildPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(Progress) or nameof(AggregateProgress)) NotifyAggregateProgressChanged();
         if (e.PropertyName is nameof(Description) or nameof(DisplayDescription) or nameof(Status))
@@ -405,17 +410,20 @@ public sealed class ManagedTask : ObservableObject
         Parent?.NotifyDisplayDescriptionChanged();
     }
 
-    private ManagedTask? GetDisplayTask() => GetDescendants()
-        .Where(task => !string.IsNullOrWhiteSpace(task.Description))
-        .OrderByDescending(task => task.Status switch
-        {
-            ManagedTaskStatus.Faulted => 4,
-            ManagedTaskStatus.Running or ManagedTaskStatus.Cancelling => 3,
-            ManagedTaskStatus.Pending or ManagedTaskStatus.Waiting => 2,
-            _ => 1
-        })
-        .ThenByDescending(task => task.CreatedAt)
-        .FirstOrDefault();
+    private ManagedTask? GetDisplayTask()
+    {
+        return GetDescendants()
+            .Where(task => !string.IsNullOrWhiteSpace(task.Description))
+            .OrderByDescending(task => task.Status switch
+            {
+                ManagedTaskStatus.Faulted => 4,
+                ManagedTaskStatus.Running or ManagedTaskStatus.Cancelling => 3,
+                ManagedTaskStatus.Pending or ManagedTaskStatus.Waiting => 2,
+                _ => 1
+            })
+            .ThenByDescending(task => task.CreatedAt)
+            .FirstOrDefault();
+    }
 
     private IEnumerable<ManagedTask> GetDescendants()
     {

@@ -9,7 +9,7 @@ public enum TaskLogLevel
 }
 
 /// <summary>
-/// 一条属于特定任务的结构化日志。
+///     一条属于特定任务的结构化日志。
 /// </summary>
 public sealed record TaskLogEntry(
     DateTimeOffset Timestamp,

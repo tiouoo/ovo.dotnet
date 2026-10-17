@@ -6,7 +6,7 @@ public static class Object
     {
         return obj == null;
     }
-    
+
     public static string ToBase64(this byte[] bytes)
     {
         var base64String = Convert.ToBase64String(bytes);

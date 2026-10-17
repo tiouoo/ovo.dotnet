@@ -5,8 +5,8 @@ namespace Standard.Modules.Helper;
 
 public class Debouncer
 {
-    private readonly Timer _timer;
     private readonly Action _action;
+    private readonly Timer _timer;
 
     public Debouncer(Action action, double interval = 1000)
     {

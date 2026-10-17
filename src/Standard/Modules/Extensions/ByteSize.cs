@@ -10,18 +10,22 @@ public static class ByteSize
         return unit == "bytes" ? $"{Math.Round(value)} {unit}" : $"{value.ToString($"F{decimalPlaces}")} {unit}";
     }
 
-    public static string ToHumanReadableSize(this int bytes, int decimalPlaces = 2) 
-        => ((double)bytes).ToHumanReadableSize(decimalPlaces);
+    public static string ToHumanReadableSize(this int bytes, int decimalPlaces = 2)
+    {
+        return ((double)bytes).ToHumanReadableSize(decimalPlaces);
+    }
 
-    public static string ToHumanReadableSize(this long bytes, int decimalPlaces = 2) 
-        => ((double)bytes).ToHumanReadableSize(decimalPlaces);
+    public static string ToHumanReadableSize(this long bytes, int decimalPlaces = 2)
+    {
+        return ((double)bytes).ToHumanReadableSize(decimalPlaces);
+    }
 
     public static (double Value, string Unit) GetReadableRaw(this double bytes, int decimalPlaces = 2)
     {
         if (bytes < 0) throw new ArgumentException("字节数不能为负数");
 
-        double value = bytes;
-        int unitIndex = 0;
+        var value = bytes;
+        var unitIndex = 0;
 
         while (unitIndex < Units.Length - 1 && value >= 819.2)
         {
@@ -32,6 +36,8 @@ public static class ByteSize
         return (Math.Round(value, decimalPlaces), Units[unitIndex]);
     }
 
-    public static (double Value, string Unit) GetReadableRaw(this int bytes, int decimalPlaces = 2) 
-        => ((double)bytes).GetReadableRaw(decimalPlaces);
+    public static (double Value, string Unit) GetReadableRaw(this int bytes, int decimalPlaces = 2)
+    {
+        return ((double)bytes).GetReadableRaw(decimalPlaces);
+    }
 }

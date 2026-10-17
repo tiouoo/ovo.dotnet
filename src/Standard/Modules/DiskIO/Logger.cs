@@ -29,10 +29,10 @@ public class Logger
         set => Volatile.Write(ref _minimumLevel,
             Enum.IsDefined(value) ? (int)value : (int)LogLevel.Info);
     }
-    
+
     public static void Initialize(
-        string logDirectory, 
-        string appName = "Application", 
+        string logDirectory,
+        string appName = "Application",
         string version = "Unknown")
     {
         if (_initialized) return;
@@ -40,11 +40,9 @@ public class Logger
         try
         {
             if (string.IsNullOrWhiteSpace(logDirectory))
-            {
                 throw new ArgumentNullException(nameof(logDirectory), "日志输出目录不能为空。");
-            }
 
-            if (!Directory.Exists(logDirectory)) 
+            if (!Directory.Exists(logDirectory))
                 Directory.CreateDirectory(logDirectory);
 
             // 保留以前的日志文件，创建带时间戳的备份
@@ -68,10 +66,7 @@ public class Logger
             CleanupOldLogFiles(logDirectory);
 
             // 如果传入空字符串或纯空格，兜底显示为 "Unknown"
-            if (string.IsNullOrWhiteSpace(version))
-            {
-                version = "Unknown";
-            }
+            if (string.IsNullOrWhiteSpace(version)) version = "Unknown";
 
             // 组装通用文件头
             var header = $"== {appName} Log {timestamp} ==\n" +
@@ -91,6 +86,7 @@ public class Logger
                 {
                     File.AppendAllText(_logFilePath, LogCache.ToString());
                 }
+
                 LogCache.Clear();
             }
 
@@ -103,7 +99,7 @@ public class Logger
     }
 
     /// <summary>
-    /// 清理旧的日志备份文件，只保留指定数量的最新备份
+    ///     清理旧的日志备份文件，只保留指定数量的最新备份
     /// </summary>
     private static void CleanupOldLogFiles(string logDirectory)
     {
@@ -117,9 +113,7 @@ public class Logger
 
             // 如果备份文件数量超过限制，删除最旧的文件
             if (backupFiles.Count > MaxLogBackups)
-            {
                 foreach (var file in backupFiles.Skip(MaxLogBackups))
-                {
                     try
                     {
                         file.Delete();
@@ -129,8 +123,6 @@ public class Logger
                     {
                         WriteFallbackError($"删除过时日志文件失败：{file.FullName}", exception);
                     }
-                }
-            }
         }
         catch (Exception ex)
         {
@@ -156,6 +148,7 @@ public class Logger
                 {
                     LogCache.Append(logEntry);
                 }
+
                 Console.WriteLine($"[{level}] [{source}] {message}");
                 return;
             }
@@ -173,26 +166,50 @@ public class Logger
         }
     }
 
-    public static void Debug(string message) => WriteLog(LogLevel.Debug, message);
+    public static void Debug(string message)
+    {
+        WriteLog(LogLevel.Debug, message);
+    }
 
-    public static void Info(string message) => WriteLog(LogLevel.Info, message);
+    public static void Info(string message)
+    {
+        WriteLog(LogLevel.Info, message);
+    }
 
-    public static void Warning(string message) => WriteLog(LogLevel.Warning, message);
+    public static void Warning(string message)
+    {
+        WriteLog(LogLevel.Warning, message);
+    }
 
-    public static void Error(string message) => WriteLog(LogLevel.Error, message);
+    public static void Error(string message)
+    {
+        WriteLog(LogLevel.Error, message);
+    }
 
-    public static void Error(Exception ex) => Error(ex.ToString());
+    public static void Error(Exception ex)
+    {
+        Error(ex.ToString());
+    }
 
-    public static void Error(string message, Exception ex) => Error($"{message}{Environment.NewLine}{ex}");
+    public static void Error(string message, Exception ex)
+    {
+        Error($"{message}{Environment.NewLine}{ex}");
+    }
 
-    public static void Fatal(string message) => WriteLog(LogLevel.Fatal, message);
+    public static void Fatal(string message)
+    {
+        WriteLog(LogLevel.Fatal, message);
+    }
 
     public static void Fatal(Exception ex)
     {
         Fatal(ex.ToString());
     }
 
-    public static void Fatal(string message, Exception ex) => Fatal($"{message}{Environment.NewLine}{ex}");
+    public static void Fatal(string message, Exception ex)
+    {
+        Fatal($"{message}{Environment.NewLine}{ex}");
+    }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static string GetCallSource()
@@ -211,8 +228,10 @@ public class Logger
                 declaringType = stateMachineType.DeclaringType;
                 method = declaringType?.GetMethods(BindingFlags.Instance | BindingFlags.Static |
                                                    BindingFlags.Public | BindingFlags.NonPublic)
-                    .FirstOrDefault(candidate => candidate.GetCustomAttribute<AsyncStateMachineAttribute>()?.StateMachineType == stateMachineType)
-                    ?? method;
+                             .FirstOrDefault(candidate =>
+                                 candidate.GetCustomAttribute<AsyncStateMachineAttribute>()?.StateMachineType ==
+                                 stateMachineType)
+                         ?? method;
             }
 
             var typeName = declaringType?.FullName;

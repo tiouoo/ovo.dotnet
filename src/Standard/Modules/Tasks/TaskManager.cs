@@ -6,7 +6,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 namespace Standard.Modules.Tasks;
 
 /// <summary>
-/// 应用生命周期内唯一的任务创建入口和根任务记录器。
+///     应用生命周期内唯一的任务创建入口和根任务记录器。
 /// </summary>
 public sealed class TaskManager : ObservableObject
 {
@@ -23,14 +23,14 @@ public sealed class TaskManager : ObservableObject
     public ReadOnlyObservableCollection<ManagedTask> RootTasks { get; }
 
     /// <summary>
-    /// 按状态优先级选出的根任务；同一状态取列表中的最后一个任务。
+    ///     按状态优先级选出的根任务；同一状态取列表中的最后一个任务。
     /// </summary>
     public ManagedTask? CurrentTask => GetDisplayRootTasks().LastOrDefault();
 
     public ManagedTaskStatus? CurrentStatus => CurrentTask?.Status;
 
     /// <summary>
-    /// 按状态优先级选出的根任务标题。
+    ///     按状态优先级选出的根任务标题。
     /// </summary>
     public string? CurrentTaskTitle
     {
@@ -48,8 +48,8 @@ public sealed class TaskManager : ObservableObject
     public bool HasAdditionalTasks => AdditionalTaskCount > 0;
 
     /// <summary>
-    /// 创建处于 <see cref="ManagedTaskStatus.Pending"/> 状态的根任务。
-    /// 调用 <see cref="ManagedTask.Start"/> 前不会执行任何任务代码。
+    ///     创建处于 <see cref="ManagedTaskStatus.Pending" /> 状态的根任务。
+    ///     调用 <see cref="ManagedTask.Start" /> 前不会执行任何任务代码。
     /// </summary>
     public ManagedTask CreateTask(TaskOptions options)
     {
@@ -59,7 +59,7 @@ public sealed class TaskManager : ObservableObject
     }
 
     /// <summary>
-    /// 创建带执行器的根任务。仍需由调用方在准备完成后显式调用 <see cref="ManagedTask.Start"/>。
+    ///     创建带执行器的根任务。仍需由调用方在准备完成后显式调用 <see cref="ManagedTask.Start" />。
     /// </summary>
     public ManagedTask CreateTask(TaskOptions options, Func<TaskExecutionContext, Task> operation)
     {
@@ -71,14 +71,11 @@ public sealed class TaskManager : ObservableObject
 
     public void RequestCancellationForAll()
     {
-        foreach (var task in _rootTasks)
-        {
-            task.RequestCancellation();
-        }
+        foreach (var task in _rootTasks) task.RequestCancellation();
     }
 
     /// <summary>
-    /// 从任务列表中移除已结束的根任务。
+    ///     从任务列表中移除已结束的根任务。
     /// </summary>
     public bool RemoveTerminalTask(ManagedTask task)
     {
@@ -91,14 +88,12 @@ public sealed class TaskManager : ObservableObject
     private void OnRootTasksChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.NewItems is not null)
-        {
-            foreach (ManagedTask task in e.NewItems) ObserveTaskTree(task);
-        }
+            foreach (ManagedTask task in e.NewItems)
+                ObserveTaskTree(task);
 
         if (e.OldItems is not null)
-        {
-            foreach (ManagedTask task in e.OldItems) StopObservingTaskTree(task);
-        }
+            foreach (ManagedTask task in e.OldItems)
+                StopObservingTaskTree(task);
 
         NotifyCurrentTaskChanged();
     }
@@ -120,9 +115,11 @@ public sealed class TaskManager : ObservableObject
     private void OnTaskChildrenChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.NewItems is not null)
-            foreach (ManagedTask task in e.NewItems) ObserveTaskTree(task);
+            foreach (ManagedTask task in e.NewItems)
+                ObserveTaskTree(task);
         if (e.OldItems is not null)
-            foreach (ManagedTask task in e.OldItems) StopObservingTaskTree(task);
+            foreach (ManagedTask task in e.OldItems)
+                StopObservingTaskTree(task);
         NotifyCurrentTaskChanged();
     }
 
@@ -149,12 +146,14 @@ public sealed class TaskManager : ObservableObject
         return _rootTasks.Where(task => GetDisplayPriority(task) == priority).ToList();
     }
 
-    private static int GetDisplayPriority(ManagedTask task) => task.Status switch
+    private static int GetDisplayPriority(ManagedTask task)
     {
-        ManagedTaskStatus.Faulted => 4,
-        ManagedTaskStatus.Running or ManagedTaskStatus.Cancelling => 3,
-        ManagedTaskStatus.Pending or ManagedTaskStatus.Waiting => 2,
-        _ => 1
-    };
-
+        return task.Status switch
+        {
+            ManagedTaskStatus.Faulted => 4,
+            ManagedTaskStatus.Running or ManagedTaskStatus.Cancelling => 3,
+            ManagedTaskStatus.Pending or ManagedTaskStatus.Waiting => 2,
+            _ => 1
+        };
+    }
 }

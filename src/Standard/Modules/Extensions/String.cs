@@ -1,6 +1,5 @@
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 
 namespace Standard.Modules.Extensions;
 
@@ -31,7 +30,7 @@ public static class Extensions
 
     public static int ToInt(this string? str, int defaultValue = 0)
     {
-        return int.TryParse(str, out int result) ? result : defaultValue;
+        return int.TryParse(str, out var result) ? result : defaultValue;
     }
 
     public static bool IsNullOrEmpty<T>(this IEnumerable<T>? source)
@@ -44,10 +43,7 @@ public static class Extensions
         if (source == null) throw new ArgumentNullException(nameof(source));
         if (action == null) throw new ArgumentNullException(nameof(action));
 
-        foreach (T item in source)
-        {
-            action(item);
-        }
+        foreach (var item in source) action(item);
     }
 
     public static T ThrowIfNull<T>(this T? obj, string paramName, string? message = null) where T : class
@@ -80,7 +76,7 @@ public static class Extensions
             return timeSpan.Hours > 1 ? $"{timeSpan.Hours} 小时前" : "1 小时前";
         if (timeSpan <= TimeSpan.FromDays(30))
             return timeSpan.Days > 1 ? $"{timeSpan.Days} 天前" : "昨天";
-        
+
         return dateTime.ToString("yyyy-MM-dd");
     }
 }

@@ -1,5 +1,3 @@
-using System;
-
 namespace Portal.Core.Helpers;
 
 public static class UrlHelper
@@ -9,22 +7,20 @@ public static class UrlHelper
         if (string.IsNullOrWhiteSpace(url))
             return string.Empty;
 
-        string input = url.Trim();
-        string tempUriStr = input;
+        var input = url.Trim();
+        var tempUriStr = input;
         if (!input.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
             !input.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
-        {
             tempUriStr = $"https://{input}";
-        }
 
         try
         {
-            Uri uri = new Uri(tempUriStr);
-            string hostPart = uri.Authority;
-            string path = uri.AbsolutePath.TrimEnd('/');
-            string query = uri.Query;
-            string fragment = uri.Fragment;
-            string result = $"{hostPart}{path}{query}{fragment}";
+            var uri = new Uri(tempUriStr);
+            var hostPart = uri.Authority;
+            var path = uri.AbsolutePath.TrimEnd('/');
+            var query = uri.Query;
+            var fragment = uri.Fragment;
+            var result = $"{hostPart}{path}{query}{fragment}";
             return result;
         }
         catch (UriFormatException)
@@ -63,23 +59,18 @@ public static class UrlHelper
         if (string.IsNullOrWhiteSpace(url))
             return string.Empty;
 
-        string input = url.Trim();
+        var input = url.Trim();
 
         if (Uri.TryCreate(input, UriKind.Absolute, out var uriResult) &&
             (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps))
-        {
             return uriResult.Host;
-        }
 
-        string prefixed = input.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
-                          input.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+        var prefixed = input.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                       input.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
             ? input
             : $"https://{input}";
 
-        if (Uri.TryCreate(prefixed, UriKind.Absolute, out var uriResult2))
-        {
-            return uriResult2.Host;
-        }
+        if (Uri.TryCreate(prefixed, UriKind.Absolute, out var uriResult2)) return uriResult2.Host;
 
         return string.Empty;
     }

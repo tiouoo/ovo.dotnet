@@ -4,12 +4,12 @@ using CommunityToolkit.Mvvm.Input;
 namespace Standard.Modules.Tasks;
 
 /// <summary>
-/// 可直接绑定到 UI 按钮的任务操作。
+///     可直接绑定到 UI 按钮的任务操作。
 /// </summary>
 public sealed class TaskAction : ObservableObject
 {
-    private readonly ManagedTask _task;
     private readonly TaskActionDefinition _definition;
+    private readonly ManagedTask _task;
 
     internal TaskAction(ManagedTask task, TaskActionDefinition definition)
     {
@@ -37,7 +37,10 @@ public sealed class TaskAction : ObservableObject
         Command.NotifyCanExecuteChanged();
     }
 
-    private bool CanExecute() => _definition.CanExecute?.Invoke(_task) ?? true;
+    private bool CanExecute()
+    {
+        return _definition.CanExecute?.Invoke(_task) ?? true;
+    }
 
     private async Task ExecuteAsync()
     {

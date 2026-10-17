@@ -4,15 +4,15 @@ public static class NumberExtensions
 {
     public static bool Between(this int value, int min, int max, bool inclusive = true)
     {
-        return inclusive 
-            ? value >= min && value <= max 
+        return inclusive
+            ? value >= min && value <= max
             : value > min && value < max;
     }
 
     public static bool Between(this double value, double min, double max, bool inclusive = true)
     {
-        return inclusive 
-            ? value >= min && value <= max 
+        return inclusive
+            ? value >= min && value <= max
             : value > min && value < max;
     }
 
@@ -55,13 +55,14 @@ public static class NumberExtensions
     public static string ToFileSize(this long bytes)
     {
         string[] suffixes = { "B", "KiB", "MiB", "GiB", "TiB", "PiB" };
-        int counter = 0;
+        var counter = 0;
         decimal number = bytes;
         while (Math.Round(number / 1024) >= 1)
         {
             number /= 1024;
             counter++;
         }
+
         return $"{number:F2} {suffixes[counter]}";
     }
 
