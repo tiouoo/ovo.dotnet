@@ -235,7 +235,7 @@ public static class Logger
         }
         catch
         {
-
+            // ignored
         }
     }
 }

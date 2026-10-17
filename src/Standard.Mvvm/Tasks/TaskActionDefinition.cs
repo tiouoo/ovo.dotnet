@@ -1,4 +1,4 @@
-namespace Standard.Tasks;
+namespace Standard.Mvvm.Tasks;
 
 public sealed class TaskActionDefinition
 {

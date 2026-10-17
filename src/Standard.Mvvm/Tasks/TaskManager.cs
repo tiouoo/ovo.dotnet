@@ -3,7 +3,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace Standard.Tasks;
+namespace Standard.Mvvm.Tasks;
 
 public sealed class TaskManager : ObservableObject
 {

@@ -1,3 +1,5 @@
 <Solution>
     <Project Path="src/Standard/Standard.csproj"/>
+    <Project Path="src/Standard.Mvvm/Standard.Mvvm.csproj"/>
+    <Project Path="src/Standard.Avalonia/Standard.Avalonia.csproj"/>
 </Solution>

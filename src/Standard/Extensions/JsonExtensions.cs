@@ -8,11 +8,9 @@ public static class JsonExtensions
     public static string AsJson(this object? obj, bool indented = true)
     {
         var options = new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
-        if (indented)
-        {
-            options.WriteIndented = true;
-            options.IndentSize = 2;
-        }
+        if (!indented) return JsonSerializer.Serialize(obj, obj?.GetType() ?? typeof(object), options);
+        options.WriteIndented = true;
+        options.IndentSize = 2;
 
         return JsonSerializer.Serialize(obj, obj?.GetType() ?? typeof(object), options);
     }

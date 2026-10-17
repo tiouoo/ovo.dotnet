@@ -1,7 +1,7 @@
-using Avalonia.Data.Converters;
 using System.Globalization;
+using Avalonia.Data.Converters;
 
-namespace Standard.UI.Converters;
+namespace Standard.Avalonia.UI.Converters;
 
 public class CharacterWrapConverter : IValueConverter
 {
@@ -11,7 +11,7 @@ public class CharacterWrapConverter : IValueConverter
         return value;
     }
 
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         throw new NotSupportedException();
     }

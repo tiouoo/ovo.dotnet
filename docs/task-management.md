@@ -1,13 +1,15 @@
 # 任务管理
 
-`Standard.Tasks` 提供应用生命周期内统一的任务记录、嵌套、取消、进度、描述、日志和 UI 操作能力。
+`Standard.Mvvm.Tasks` 提供应用生命周期内统一的任务记录、嵌套、取消、进度、描述、日志和 UI 操作能力。
+
+任务管理位于 `Standard.Mvvm` 项目，使用方需要引用 `src/Standard.Mvvm/Standard.Mvvm.csproj`。该项目依赖 CommunityToolkit.Mvvm，可用于 Avalonia 或其他支持 MVVM 的 UI 框架。通用的 `TaskExtensions.Forget` 仍位于核心项目的 `Standard.Tasks` 命名空间。
 
 ## 基本用法
 
 通过全局单例 `TaskManager.Instance` 创建根任务。创建只会生成状态为 `Pending` 的实体和任务树，绝不会自动执行；在验证、配置和子任务添加完成后，调用 `Start()` 才启动任务。
 
 ```csharp
-using Standard.Tasks;
+using Standard.Mvvm.Tasks;
 
 var task = TaskManager.Instance.CreateTask(
     new TaskOptions

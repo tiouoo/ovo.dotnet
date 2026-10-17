@@ -2,7 +2,7 @@ namespace Standard.Extensions;
 
 public static class ByteSizeExtensions
 {
-    private static readonly string[] Units = { "bytes", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB" };
+    private static readonly string[] Units = ["bytes", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB"];
 
     public static string ToHumanReadableSize(this double bytes, int decimalPlaces = 2)
     {

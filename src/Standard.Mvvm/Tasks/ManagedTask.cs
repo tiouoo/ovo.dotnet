@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Text;
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace Standard.Tasks;
+namespace Standard.Mvvm.Tasks;
 
 public sealed class ManagedTask : ObservableObject
 {
@@ -13,13 +13,7 @@ public sealed class ManagedTask : ObservableObject
     private readonly ObservableCollection<ManagedTask> _children = [];
     private readonly TaskCompletionSource _completionSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private readonly ObservableCollection<TaskLogEntry> _logs = [];
-    private DateTimeOffset? _completedAt;
-    private string? _description;
-    private Exception? _exception;
     private Func<TaskExecutionContext, Task>? _operation;
-    private double? _progress;
-    private DateTimeOffset? _startedAt;
-    private ManagedTaskStatus _status = ManagedTaskStatus.Pending;
 
     internal ManagedTask(ManagedTask? parent, TaskOptions options, Func<TaskExecutionContext, Task>? operation)
     {
@@ -49,10 +43,10 @@ public sealed class ManagedTask : ObservableObject
 
     public string? Description
     {
-        get => _description;
+        get;
         private set
         {
-            if (!SetProperty(ref _description, value)) return;
+            if (!SetProperty(ref field, value)) return;
             OnPropertyChanged(nameof(DisplayDescription));
             Parent?.NotifyDisplayDescriptionChanged();
         }
@@ -68,10 +62,10 @@ public sealed class ManagedTask : ObservableObject
 
     public ManagedTaskStatus Status
     {
-        get => _status;
+        get;
         private set
         {
-            if (!SetProperty(ref _status, value)) return;
+            if (!SetProperty(ref field, value)) return;
 
             OnPropertyChanged(nameof(IsTerminal));
             OnPropertyChanged(nameof(CanBeCancelled));
@@ -79,26 +73,26 @@ public sealed class ManagedTask : ObservableObject
             Parent?.NotifyDisplayDescriptionChanged();
             foreach (var action in _actions) action.Refresh();
         }
-    }
+    } = ManagedTaskStatus.Pending;
 
     public DateTimeOffset CreatedAt { get; } = DateTimeOffset.Now;
 
     public DateTimeOffset? StartedAt
     {
-        get => _startedAt;
-        private set => SetProperty(ref _startedAt, value);
+        get;
+        private set => SetProperty(ref field, value);
     }
 
     public DateTimeOffset? CompletedAt
     {
-        get => _completedAt;
-        private set => SetProperty(ref _completedAt, value);
+        get;
+        private set => SetProperty(ref field, value);
     }
 
     public Exception? Exception
     {
-        get => _exception;
-        private set => SetProperty(ref _exception, value);
+        get;
+        private set => SetProperty(ref field, value);
     }
 
     public string? ErrorMessage => Exception?.Message;
@@ -107,8 +101,8 @@ public sealed class ManagedTask : ObservableObject
 
     public double? Progress
     {
-        get => _progress;
-        private set => SetProperty(ref _progress, value);
+        get;
+        private set => SetProperty(ref field, value);
     }
 
     public double? AggregateProgress
@@ -174,7 +168,7 @@ public sealed class ManagedTask : ObservableObject
         }
         catch
         {
-
+            // ignored
         }
     }
 

@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
-namespace Standard.Tasks;
+namespace Standard.Mvvm.Tasks;
 
 public sealed class TaskAction : ObservableObject
 {

@@ -1,5 +1,3 @@
-using Avalonia.Input;
-
 namespace Standard.Events;
 
 public static class ApplicationEvents
@@ -29,10 +27,4 @@ public static class ApplicationEvents
         return true;
     }
 
-    public static event Action<object?, DragEventArgs>? DragDrop;
-
-    public static void RaiseDragDrop(object? sender, DragEventArgs e)
-    {
-        DragDrop?.Invoke(sender, e);
-    }
 }

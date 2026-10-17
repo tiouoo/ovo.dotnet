@@ -11,6 +11,6 @@ public static class ApplicationBootstrapper
         Logger.Initialize(Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), settingsDirectoryName ?? appName, "Logs"),
             appName, version);
-        if (Standard.Platform.RuntimeEnvironment.IsDesktop) DesktopPlatformDetector.Initialize();
+        if (RuntimeEnvironment.IsDesktop) DesktopPlatformDetector.Initialize();
     }
 }
