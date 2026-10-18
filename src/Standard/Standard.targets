@@ -1,0 +1,13 @@
+<Project>
+    <!-- ProjectReference consumers import this file explicitly; NuGet imports it via buildTransitive. -->
+    <Target Name="StandardEmbedBuildValues" BeforeTargets="GetAssemblyAttributes">
+        <ItemGroup>
+            <StandardBuildValue Condition="'%(StandardBuildValue.Value)' == '' and '%(StandardBuildValue.EnvironmentVariable)' != ''">
+                <Value>$([System.Environment]::GetEnvironmentVariable('%(StandardBuildValue.EnvironmentVariable)'))</Value>
+            </StandardBuildValue>
+            <AssemblyMetadata Include="@(StandardBuildValue)" Condition="'%(StandardBuildValue.Value)' != ''">
+                <Value>%(StandardBuildValue.Value)</Value>
+            </AssemblyMetadata>
+        </ItemGroup>
+    </Target>
+</Project>

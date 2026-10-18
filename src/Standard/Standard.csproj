@@ -4,6 +4,12 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Update="Build/README.md" Pack="true" PackagePath="README.md" />
+        <None Update="Standard.targets" Pack="true" PackagePath="buildTransitive/Standard.targets" />
+    </ItemGroup>
 
 </Project>
