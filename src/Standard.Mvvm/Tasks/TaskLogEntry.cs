@@ -1,3 +1,5 @@
+using System;
+
 namespace Standard.Mvvm.Tasks;
 
 public sealed record TaskLogEntry(

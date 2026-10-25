@@ -1,3 +1,5 @@
+using System;
+
 namespace Standard.Events;
 
 public static class InitializationEvents

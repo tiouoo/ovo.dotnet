@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Standard.Mvvm.Tasks;
 
 public sealed class TaskOptions

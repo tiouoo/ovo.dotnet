@@ -1,3 +1,5 @@
+using System;
+
 namespace Standard.Net;
 
 public static class UrlUtilities
