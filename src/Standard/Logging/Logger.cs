@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -200,6 +201,10 @@ public static class Logger
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
+    [UnconditionalSuppressMessage("Trimming", "IL2026",
+        Justification = "Call source diagnostics intentionally inspect stack frame methods at runtime.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2075",
+        Justification = "Call source diagnostics intentionally inspect declaring type methods at runtime.")]
     private static string GetCallSource()
     {
         var frames = new StackTrace().GetFrames();
