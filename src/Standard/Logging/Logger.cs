@@ -49,6 +49,17 @@ public static class Logger
                 var logDirectory = options.LogDirectory;
                 if (string.IsNullOrWhiteSpace(logDirectory))
                     throw new ArgumentNullException(nameof(logDirectory), "日志输出目录不能为空。");
+                
+                var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+
+                var header = $"== {options.AppName} Log {timestamp} ==\n" +
+                             $"Version: {options.Version}\n" +
+                             $"OS: {Environment.OSVersion}\n" +
+                             $"Runtime: {Environment.Version}\n" +
+                             "===============================\n";
+                options.HeaderAction?.Invoke();
+                if (options.AppendHeader) File.AppendAllText(_logFilePath, header);
+
 
                 MaxLogBackups = options.LogFileCount;
                 Volatile.Write(ref _showCallSource, options.ShowCallSource);
@@ -56,18 +67,8 @@ public static class Logger
                 if (!Directory.Exists(logDirectory))
                     Directory.CreateDirectory(logDirectory);
 
-                var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
                 _logFilePath = Path.Combine(logDirectory, "latest.log");
-
-                var header = $"== {options.AppName} Log {timestamp} ==\n" +
-                             $"Version: {options.Version}\n" +
-                             $"OS: {Environment.OSVersion}\n" +
-                             $"Runtime: {Environment.Version}\n" +
-                             "===============================\n";
-
-                options.HeaderAction?.Invoke();
-                if (options.AppendHeader) File.AppendAllText(_logFilePath, header);
-
+                
                 if (File.Exists(_logFilePath))
                 {
                     var backupPath = Path.Combine(logDirectory, $"log_{timestamp}.log");
