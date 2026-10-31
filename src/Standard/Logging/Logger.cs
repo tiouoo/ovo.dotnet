@@ -236,6 +236,10 @@ public static class Logger
             if (method is null || declaringType is null || declaringType == typeof(Logger))
                 continue;
 
+            if (method.IsDefined(typeof(LogSourceHiddenAttribute), false) ||
+                declaringType.IsDefined(typeof(LogSourceHiddenAttribute), false))
+                continue;
+
             if (typeof(IAsyncStateMachine).IsAssignableFrom(declaringType))
             {
                 var stateMachineType = declaringType;
@@ -248,10 +252,27 @@ public static class Logger
                          ?? method;
             }
 
+            if (method.IsDefined(typeof(LogSourceHiddenAttribute), false) ||
+                declaringType?.IsDefined(typeof(LogSourceHiddenAttribute), false) == true)
+                continue;
+
+            var methodName = method.Name;
+            // 将闭包和局部函数的编译器名称还原为所在业务方法。
+            if (methodName.StartsWith('<') && methodName.IndexOf('>') is var end && end > 1)
+            {
+                methodName = methodName[1..end];
+                while (declaringType?.IsDefined(typeof(CompilerGeneratedAttribute), false) == true &&
+                       declaringType.DeclaringType is not null)
+                    declaringType = declaringType.DeclaringType;
+            }
+
+            if (declaringType?.IsDefined(typeof(LogSourceHiddenAttribute), false) == true)
+                continue;
+
             var typeName = declaringType?.FullName;
             return string.IsNullOrEmpty(typeName)
-                ? method.Name
-                : $"{typeName}.{method.Name}";
+                ? methodName
+                : $"{typeName}.{methodName}";
         }
 
         return "Unknown";
