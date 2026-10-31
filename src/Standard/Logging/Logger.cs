@@ -25,6 +25,7 @@ public static class Logger
     private static readonly Lock LockObj = new();
     private static string _logFilePath = string.Empty;
     private static bool _initialized;
+    private static bool _showCallSource;
     private static int _minimumLevel = (int)LogLevel.Info;
     private static readonly StringBuilder LogCache = new();
 
@@ -35,21 +36,22 @@ public static class Logger
             Enum.IsDefined(value) ? (int)value : (int)LogLevel.Info);
     }
 
-    public static void Initialize(string logDirectory,
-        string appName = "Application",
-        string version = "Unknown",
-        int logFileCount = 3,
-        bool appendHeader = true, Action? headerAction = null)
+    public static void Initialize(LoggerOptions options)
     {
-        MaxLogBackups = logFileCount;
+        Console.OutputEncoding = Encoding.UTF8;
+        ArgumentNullException.ThrowIfNull(options);
         lock (LockObj)
         {
             if (_initialized) return;
 
             try
             {
+                var logDirectory = options.LogDirectory;
                 if (string.IsNullOrWhiteSpace(logDirectory))
                     throw new ArgumentNullException(nameof(logDirectory), "日志输出目录不能为空。");
+
+                MaxLogBackups = options.LogFileCount;
+                Volatile.Write(ref _showCallSource, options.ShowCallSource);
 
                 if (!Directory.Exists(logDirectory))
                     Directory.CreateDirectory(logDirectory);
@@ -57,14 +59,14 @@ public static class Logger
                 var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
                 _logFilePath = Path.Combine(logDirectory, "latest.log");
 
-                var header = $"== {appName} Log {timestamp} ==\n" +
-                             $"Version: {version}\n" +
+                var header = $"== {options.AppName} Log {timestamp} ==\n" +
+                             $"Version: {options.Version}\n" +
                              $"OS: {Environment.OSVersion}\n" +
                              $"Runtime: {Environment.Version}\n" +
                              "===============================\n";
 
-                headerAction?.Invoke();
-                if (appendHeader) File.AppendAllText(_logFilePath, header);
+                options.HeaderAction?.Invoke();
+                if (options.AppendHeader) File.AppendAllText(_logFilePath, header);
 
                 if (File.Exists(_logFilePath))
                 {
@@ -80,8 +82,6 @@ public static class Logger
                 }
 
                 CleanupOldLogFiles(logDirectory);
-
-                if (string.IsNullOrWhiteSpace(version)) version = "Unknown";
 
                 _initialized = true;
 
@@ -138,8 +138,8 @@ public static class Logger
 
         var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
         var threadId = Thread.CurrentThread.ManagedThreadId.ToString();
-        var source = GetCallSource();
-        var logEntry = $"[{timestamp}] [{level}] [Thread-{threadId}] [{source}] {message}\n";
+        var source = Volatile.Read(ref _showCallSource) ? $"[{GetCallSource()}] " : string.Empty;
+        var logEntry = $"[{timestamp}] [{level}] [Thread-{threadId}] {source}{message}\n";
 
         try
         {
@@ -149,7 +149,7 @@ public static class Logger
                 else LogCache.Append(logEntry);
             }
 
-            Console.WriteLine($"[{level}] [{source}] {message}");
+            Console.WriteLine($"[{level}] {source}{message}");
         }
         catch (Exception ex)
         {
