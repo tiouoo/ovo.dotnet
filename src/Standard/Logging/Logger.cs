@@ -21,7 +21,7 @@ public static class Logger
         Fatal
     }
 
-    private const int MaxLogBackups = 3;
+    private static int MaxLogBackups = 3;
     private static readonly Lock LockObj = new();
     private static string _logFilePath = string.Empty;
     private static bool _initialized;
@@ -35,26 +35,37 @@ public static class Logger
             Enum.IsDefined(value) ? (int)value : (int)LogLevel.Info);
     }
 
-    public static void Initialize(
-        string logDirectory,
+    public static void Initialize(string logDirectory,
         string appName = "Application",
-        string version = "Unknown")
+        string version = "Unknown",
+        int logFileCount = 3,
+        bool appendHeader = true, Action? headerAction = null)
     {
+        MaxLogBackups = logFileCount;
         lock (LockObj)
         {
             if (_initialized) return;
-    
+
             try
             {
                 if (string.IsNullOrWhiteSpace(logDirectory))
                     throw new ArgumentNullException(nameof(logDirectory), "日志输出目录不能为空。");
-    
+
                 if (!Directory.Exists(logDirectory))
                     Directory.CreateDirectory(logDirectory);
 
                 var timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
                 _logFilePath = Path.Combine(logDirectory, "latest.log");
-    
+
+                var header = $"== {appName} Log {timestamp} ==\n" +
+                             $"Version: {version}\n" +
+                             $"OS: {Environment.OSVersion}\n" +
+                             $"Runtime: {Environment.Version}\n" +
+                             "===============================\n";
+
+                headerAction?.Invoke();
+                if (appendHeader) File.AppendAllText(_logFilePath, header);
+
                 if (File.Exists(_logFilePath))
                 {
                     var backupPath = Path.Combine(logDirectory, $"log_{timestamp}.log");
@@ -72,14 +83,6 @@ public static class Logger
 
                 if (string.IsNullOrWhiteSpace(version)) version = "Unknown";
 
-                var header = $"== {appName} Log {timestamp} ==\n" +
-                             $"Version: {version}\n" +
-                             $"OS: {Environment.OSVersion}\n" +
-                             $"Runtime: {Environment.Version}\n" +
-                             "===============================\n";
-    
-                File.AppendAllText(_logFilePath, header);
-    
                 _initialized = true;
 
                 if (LogCache.Length > 0)
@@ -88,10 +91,10 @@ public static class Logger
                     {
                         File.AppendAllText(_logFilePath, LogCache.ToString());
                     }
-    
+
                     LogCache.Clear();
                 }
-    
+
                 Info("日志系统初始化完成");
             }
             catch (Exception ex)
@@ -105,7 +108,6 @@ public static class Logger
     {
         try
         {
-
             var backupFiles = Directory.GetFiles(logDirectory, "log_*.log")
                 .Select(f => new FileInfo(f))
                 .OrderByDescending(f => f.CreationTime)
@@ -152,6 +154,24 @@ public static class Logger
         catch (Exception ex)
         {
             WriteFallbackError($"写入 {level} 日志失败。", ex);
+        }
+    }
+
+    public static void Append(string message)
+    {
+        try
+        {
+            lock (LockObj)
+            {
+                if (_initialized) File.AppendAllText(_logFilePath, message + "\n");
+                else LogCache.Append(message + "\n");
+            }
+
+            Console.WriteLine(message);
+        }
+        catch (Exception ex)
+        {
+            WriteFallbackError($"写入 {message} 日志失败。", ex);
         }
     }
 
